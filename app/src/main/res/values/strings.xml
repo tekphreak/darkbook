@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">Darkbook</string>
+    <string name="settings_title">Settings</string>
+    <string name="menu_settings">Settings</string>
+
+    <string name="website_button">TEKPHREAK.COM</string>
+
+    <string name="lock_title">Darkbook is locked</string>
+    <string name="lock_unlock_biometric">Unlock with biometrics</string>
+    <string name="lock_use_pin">Use PIN instead</string>
+    <string name="lock_enter_pin">Enter PIN</string>
+    <string name="lock_set_pin">Set a PIN</string>
+    <string name="lock_confirm_pin">Confirm PIN</string>
+    <string name="lock_pin_mismatch">PINs don\'t match. Try again.</string>
+    <string name="lock_pin_wrong">Wrong PIN.</string>
+    <string name="lock_pin_submit">Submit</string>
+    <string name="lock_no_recovery">No recovery — this is a private diary. Forgetting your PIN means resetting the app.</string>
+
+    <string name="entry_list_empty">No entries yet. Tap + to write your first one.</string>
+    <string name="entry_list_new">New Entry</string>
+    <string name="entry_edit_title">Edit Entry</string>
+    <string name="entry_edit_hint">Write what\'s on your mind…</string>
+    <string name="entry_save">Save</string>
+    <string name="entry_delete">Delete</string>
+    <string name="entry_delete_confirm_title">Delete this entry?</string>
+    <string name="entry_delete_confirm_body">This can\'t be undone.</string>
+    <string name="entry_edited_label">Edited %1$s</string>
+    <string name="entry_attach_image">Attach image</string>
+    <string name="entry_remove_image">Remove image</string>
+    <string name="entry_export_chooser_title">Export entry text</string>
+
+    <string name="share_button">Share</string>
+    <string name="share_confirm_title">Share to Threads?</string>
+    <string name="share_confirm_body">This will open Threads with your entry text loaded. Review it before posting — diary entries can include things you don\'t mean to share.</string>
+    <string name="share_confirm_proceed">Continue</string>
+    <string name="share_confirm_cancel">Cancel</string>
+
+    <string name="settings_long_press_export">Long press to export text</string>
+    <string name="settings_font_family">Font</string>
+    <string name="settings_show_splash">Show Splash Screen</string>
+</resources>
