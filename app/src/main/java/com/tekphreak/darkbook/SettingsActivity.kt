@@ -26,10 +26,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,22 +41,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.tekphreak.darkbook.data.SettingsStore
 import com.tekphreak.darkbook.ui.SplashContent
 import com.tekphreak.darkbook.ui.theme.DarkbookTheme
 import com.tekphreak.darkbook.ui.theme.FontChoice
+import com.tekphreak.darkbook.ui.theme.MAX_ENTRY_FONT_SIZE
+import com.tekphreak.darkbook.ui.theme.MIN_ENTRY_FONT_SIZE
 
 class SettingsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             var fontChoice by remember { mutableStateOf(SettingsStore.getFontChoice(this)) }
-            DarkbookTheme(fontFamily = fontChoice.fontFamily) {
+            var fontSizeSp by remember { mutableFloatStateOf(SettingsStore.getFontSizeSp(this)) }
+            DarkbookTheme(fontFamily = fontChoice.fontFamily, bodyFontSize = fontSizeSp.sp) {
                 SettingsScreen(
                     fontChoice = fontChoice,
                     onFontChoiceChange = {
                         fontChoice = it
                         SettingsStore.setFontChoice(this, it)
+                    },
+                    fontSizeSp = fontSizeSp,
+                    onFontSizeChange = {
+                        fontSizeSp = it
+                        SettingsStore.setFontSizeSp(this, it)
                     },
                     onBack = { finish() }
                 )
@@ -68,6 +79,8 @@ class SettingsActivity : ComponentActivity() {
 private fun SettingsScreen(
     fontChoice: FontChoice,
     onFontChoiceChange: (FontChoice) -> Unit,
+    fontSizeSp: Float,
+    onFontSizeChange: (Float) -> Unit,
     onBack: () -> Unit
 ) {
     val context = LocalContext.current
@@ -148,6 +161,28 @@ private fun SettingsScreen(
                         )
                     }
                 }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+
+                Text(
+                    stringResource(R.string.settings_font_size),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.padding(16.dp)
+                )
+                Text(
+                    stringResource(R.string.settings_font_size_preview),
+                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = fontSizeSp.sp),
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+                Slider(
+                    value = fontSizeSp,
+                    onValueChange = onFontSizeChange,
+                    valueRange = MIN_ENTRY_FONT_SIZE.value..MAX_ENTRY_FONT_SIZE.value,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                )
 
                 Button(
                     onClick = { showSplashPreview = true },

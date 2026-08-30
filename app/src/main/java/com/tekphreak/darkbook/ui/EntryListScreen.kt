@@ -34,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.tekphreak.darkbook.R
 import com.tekphreak.darkbook.data.Entry
+import com.tekphreak.darkbook.ui.theme.LocalEntryFontSize
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
@@ -74,7 +75,8 @@ fun EntryListScreen(
             FloatingActionButton(onClick = onNewEntry) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.entry_list_new))
             }
-        }
+        },
+        bottomBar = { AdBanner() }
     ) { padding ->
         if (entries.isEmpty()) {
             Box(
@@ -127,7 +129,7 @@ private fun EntryRow(entry: Entry, onClick: () -> Unit, onLongClick: (() -> Unit
         }
         Text(
             entry.body.take(120),
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyLarge.copy(fontSize = LocalEntryFontSize.current),
             maxLines = 2
         )
     }

@@ -16,6 +16,21 @@ android {
         versionName "1.0"
     }
 
+    flavorDimensions = ["tier"]
+    productFlavors {
+        free {
+            dimension "tier"
+            // applicationId stays com.tekphreak.darkbook — the existing, ad-supported app.
+            buildConfigField "boolean", "SHOW_ADS", "true"
+        }
+        pro {
+            dimension "tier"
+            applicationIdSuffix ".pro"
+            versionNameSuffix "-pro"
+            buildConfigField "boolean", "SHOW_ADS", "false"
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -81,4 +96,10 @@ dependencies {
 
     // Location capture for entries
     implementation 'com.google.android.gms:play-services-location:21.2.0'
+
+    // Banner ads — free flavor only, Pro carries none of this.
+    // Pinned below 24.x: those releases ship Kotlin 2.x metadata that this
+    // project's Kotlin 1.9.22 kapt can't reliably parse (intermittent
+    // "incompatible version of Kotlin" compile failures).
+    freeImplementation 'com.google.android.gms:play-services-ads:23.6.0'
 }

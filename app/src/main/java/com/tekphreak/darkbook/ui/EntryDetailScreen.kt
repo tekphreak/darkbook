@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import com.tekphreak.darkbook.R
 import com.tekphreak.darkbook.data.Entry
 import com.tekphreak.darkbook.data.ImageStore
+import com.tekphreak.darkbook.ui.theme.LocalEntryFontSize
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
@@ -143,7 +144,7 @@ fun EntryDetailScreen(
                         contentScale = ContentScale.Crop
                     )
                 }
-                Text(entry.body, style = MaterialTheme.typography.bodyLarge)
+                Text(entry.body, style = MaterialTheme.typography.bodyLarge.copy(fontSize = LocalEntryFontSize.current))
             }
         }
 

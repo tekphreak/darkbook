@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.tekphreak.darkbook.R
 import com.tekphreak.darkbook.data.ImageStore
+import com.tekphreak.darkbook.ui.theme.LocalEntryFontSize
 
 private val SaveIconColor = Color(0xFF808080)
 
@@ -154,7 +155,7 @@ fun EntryEditScreen(
                     .weight(1f)
                     .padding(16.dp),
                 placeholder = { Text(stringResource(R.string.entry_edit_hint)) },
-                textStyle = MaterialTheme.typography.bodyLarge,
+                textStyle = MaterialTheme.typography.bodyLarge.copy(fontSize = LocalEntryFontSize.current),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Default)
             )
         }

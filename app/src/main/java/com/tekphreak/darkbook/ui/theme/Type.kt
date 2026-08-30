@@ -6,11 +6,15 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+val DEFAULT_ENTRY_FONT_SIZE = 16.sp
+val MIN_ENTRY_FONT_SIZE = 12.sp
+val MAX_ENTRY_FONT_SIZE = 28.sp
+
 fun darkbookTypography(fontFamily: FontFamily) = Typography(
     bodyLarge = TextStyle(
         fontFamily = fontFamily,
         fontWeight = FontWeight.Normal,
-        fontSize = 16.sp
+        fontSize = DEFAULT_ENTRY_FONT_SIZE
     ),
     titleLarge = TextStyle(
         fontFamily = fontFamily,

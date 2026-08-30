@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.TextUnit
 import androidx.fragment.app.FragmentActivity
 import com.tekphreak.darkbook.data.Entry
 import com.tekphreak.darkbook.data.SettingsStore
@@ -18,7 +19,9 @@ import com.tekphreak.darkbook.ui.EntryEditScreen
 import com.tekphreak.darkbook.ui.EntryListScreen
 import com.tekphreak.darkbook.ui.EntryViewModel
 import com.tekphreak.darkbook.ui.LockScreen
+import com.tekphreak.darkbook.ui.theme.DEFAULT_ENTRY_FONT_SIZE
 import com.tekphreak.darkbook.ui.theme.DarkbookTheme
+import androidx.compose.ui.unit.sp
 
 private sealed class Screen {
     object Lock : Screen()
@@ -34,15 +37,18 @@ class MainActivity : FragmentActivity() {
     private val screenState = mutableStateOf<Screen>(Screen.Lock)
     private val exportEnabledState = mutableStateOf(false)
     private val fontFamilyState = mutableStateOf<FontFamily>(FontFamily.Default)
+    private val fontSizeState = mutableStateOf<TextUnit>(DEFAULT_ENTRY_FONT_SIZE)
     private var backgroundedAt: Long? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         exportEnabledState.value = SettingsStore.isLongPressExportEnabled(this)
         fontFamilyState.value = SettingsStore.getFontChoice(this).fontFamily
+        fontSizeState.value = SettingsStore.getFontSizeSp(this).sp
         setContent {
             val fontFamily by fontFamilyState
-            DarkbookTheme(fontFamily = fontFamily) {
+            val fontSize by fontSizeState
+            DarkbookTheme(fontFamily = fontFamily, bodyFontSize = fontSize) {
                 var screen by screenState
                 val exportEnabled by exportEnabledState
                 val entries by viewModel.entries.collectAsState()
@@ -114,6 +120,7 @@ class MainActivity : FragmentActivity() {
         super.onResume()
         exportEnabledState.value = SettingsStore.isLongPressExportEnabled(this)
         fontFamilyState.value = SettingsStore.getFontChoice(this).fontFamily
+        fontSizeState.value = SettingsStore.getFontSizeSp(this).sp
         val since = backgroundedAt
         backgroundedAt = null
         if (since != null && System.currentTimeMillis() - since > LOCK_GRACE_PERIOD_MS) {

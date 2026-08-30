@@ -37,5 +37,7 @@
 
     <string name="settings_long_press_export">Long press to export text</string>
     <string name="settings_font_family">Font</string>
+    <string name="settings_font_size">Text Size</string>
+    <string name="settings_font_size_preview">The quick brown fox jumps over the lazy dog.</string>
     <string name="settings_show_splash">Show Splash Screen</string>
 </resources>
