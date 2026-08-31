@@ -40,4 +40,9 @@
     <string name="settings_font_size">Text Size</string>
     <string name="settings_font_size_preview">The quick brown fox jumps over the lazy dog.</string>
     <string name="settings_show_splash">Show Splash Screen</string>
+    <string name="settings_disclaimer">Disclaimer</string>
+    <string name="disclaimer_title">Disclaimer</string>
+    <string name="disclaimer_body">TODO: legal disclaimer text goes here.</string>
+    <string name="disclaimer_agree">Agree</string>
+    <string name="disclaimer_disagree">Disagree</string>
 </resources>

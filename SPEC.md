@@ -25,7 +25,7 @@ A private, dark-themed journal app. Local-only storage, locked behind biometrics
 2. **Entry List** — reverse-chronological list of entries, black background (#000000), white text (#FFFFFF), minimal dividers; each row shows the date, the captured coordinates (if any), and a body preview. `free` flavor shows a banner ad pinned to the bottom of the screen; Pro shows none
 3. **New/Edit Entry** — plain text editor, black bg / white text, with a paperclip icon (attach an image) and a floppy-disk icon (save) in the top bar, both line-drawing icons in `#808080`
 4. **Entry Detail** — read view with the auto-stamped date/time + coordinates header, attached image (if any — tap to view full-screen, tap/back again to return), edit/share/delete actions
-5. **Settings** — reachable via the entry list's overflow menu: long-press-to-share toggle, font family picker, entry text-size slider (with a live preview), and a "Show Splash Screen" preview button
+5. **Settings** — reachable via the entry list's overflow menu: long-press-to-share toggle, font family picker, entry text-size slider (with a live preview), a "Show Splash Screen" preview button, and a "Disclaimer" button that opens an Agree/Disagree dialog
 6. **Splash** — the app's `LAUNCHER` activity per this folder's app-wide standard; auto-advances to the Entry List after 500ms on a real launch, but its content is also reused as an on-demand preview from Settings (shown until tapped again, or until Back is pressed)
 
 ## Features
@@ -74,6 +74,11 @@ A private, dark-themed journal app. Local-only storage, locked behind biometrics
 - Bundled locally as static font resources (no network fetch at runtime, consistent with the app's local-only ethos) and applied app-wide immediately on selection
 - A separate slider (12sp–28sp, default 16sp) controls entry text *size*, with a live preview line in Settings. Deliberately isolated behind a dedicated `LocalEntryFontSize` composition local rather than `Typography.bodyLarge` — Material3's `MaterialTheme` wraps everything in `ProvideTextStyle(typography.bodyLarge)`, so overloading that slot made the *entire* Settings UI (checkboxes, radio labels) resize with the slider on the first pass. Only the three actual entry-text render sites (list row, edit screen, detail body) opt into the size
 
+### Disclaimer dialog
+- A "Disclaimer" button in Settings opens a Material3 `AlertDialog` with Agree/Disagree buttons (`disclaimer_agree` / `disclaimer_disagree` string resources)
+- The dialog body (`disclaimer_body`) is a placeholder (`"TODO: legal disclaimer text goes here."`) — swap in the real legal text via that string resource before shipping
+- Both Agree and Disagree currently just dismiss the dialog — no choice is persisted and the app doesn't gate on it; revisit if the disclaimer needs to block usage or record consent
+
 ### Ads (free flavor) / Darkbook Pro
 - Two product flavors from one codebase: `free` (`com.tekphreak.darkbook`, ad-supported) and `pro` (`com.tekphreak.darkbook.pro`, no ads) — two separate APKs/Play listings, not an in-app purchase
 - `free` shows one AdMob banner, pinned to the bottom of the Entry List via Scaffold's `bottomBar` slot
@@ -119,10 +124,12 @@ current schema version is 3.
 10. Settings "Show Splash Screen" preview toggle
 11. Entry text-size slider in Settings
 12. `free`/`pro` product flavors + AdMob banner ad on the Entry List (free only)
+13. Settings "Disclaimer" button + Agree/Disagree dialog (placeholder legal text, not yet gating or persisting the choice)
 
 Not done: wipe-and-reset after N failed PIN attempts (the app tracks a
-failed-attempt counter in `PinManager` but nothing acts on it yet), and the
-edit/delete confirmation dialogs only cover delete, not edit.
+failed-attempt counter in `PinManager` but nothing acts on it yet), the
+edit/delete confirmation dialogs only cover delete, not edit, and the
+disclaimer's real legal text/consent behavior.
 
 ## Bugs found and fixed during implementation
 

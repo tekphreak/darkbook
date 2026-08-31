@@ -17,6 +17,7 @@ import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -28,6 +29,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -86,6 +88,7 @@ private fun SettingsScreen(
     val context = LocalContext.current
     var longPressExportEnabled by remember { mutableStateOf(SettingsStore.isLongPressExportEnabled(context)) }
     var showSplashPreview by remember { mutableStateOf(false) }
+    var showDisclaimer by remember { mutableStateOf(false) }
 
     // Lets the splash preview also be dismissed with the back button, not just a tap.
     BackHandler(enabled = showSplashPreview) {
@@ -192,7 +195,41 @@ private fun SettingsScreen(
                 ) {
                     Text(stringResource(R.string.settings_show_splash))
                 }
+
+                HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
+
+                Button(
+                    onClick = { showDisclaimer = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp)
+                ) {
+                    Text(stringResource(R.string.settings_disclaimer))
+                }
             }
+        }
+
+        if (showDisclaimer) {
+            AlertDialog(
+                onDismissRequest = { showDisclaimer = false },
+                title = { Text(stringResource(R.string.disclaimer_title)) },
+                text = {
+                    Text(
+                        stringResource(R.string.disclaimer_body),
+                        modifier = Modifier.verticalScroll(rememberScrollState())
+                    )
+                },
+                confirmButton = {
+                    TextButton(onClick = { showDisclaimer = false }) {
+                        Text(stringResource(R.string.disclaimer_agree))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showDisclaimer = false }) {
+                        Text(stringResource(R.string.disclaimer_disagree))
+                    }
+                }
+            )
         }
 
         if (showSplashPreview) {
