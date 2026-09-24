@@ -19,6 +19,7 @@ import com.tekphreak.darkbook.ui.EntryEditScreen
 import com.tekphreak.darkbook.ui.EntryListScreen
 import com.tekphreak.darkbook.ui.EntryViewModel
 import com.tekphreak.darkbook.ui.LockScreen
+import com.tekphreak.darkbook.ui.RelockGuard
 import com.tekphreak.darkbook.ui.theme.DEFAULT_ENTRY_FONT_SIZE
 import com.tekphreak.darkbook.ui.theme.DarkbookTheme
 import androidx.compose.ui.unit.sp
@@ -123,7 +124,11 @@ class MainActivity : FragmentActivity() {
         fontSizeState.value = SettingsStore.getFontSizeSp(this).sp
         val since = backgroundedAt
         backgroundedAt = null
-        if (since != null && System.currentTimeMillis() - since > LOCK_GRACE_PERIOD_MS) {
+        // Always consumed, even when the grace period wasn't exceeded, so a
+        // stale suppression from this round-trip can't leak into a later,
+        // unrelated backgrounding.
+        val suppressed = RelockGuard.consumeSuppress()
+        if (since != null && System.currentTimeMillis() - since > LOCK_GRACE_PERIOD_MS && !suppressed) {
             screenState.value = Screen.Lock
         }
     }

@@ -12,8 +12,11 @@ enum class FontChoice(val id: String, val displayName: String) {
     NOTO_SANS("noto_sans", "Noto Sans"),
     NOTO_SERIF("noto_serif", "Noto Serif");
 
-    val fontFamily: FontFamily
-        get() = when (this) {
+    // Built once per enum constant rather than on every access, so recomposition
+    // (DarkbookTheme is re-invoked on most state changes app-wide) doesn't keep
+    // allocating a fresh FontFamily wrapper for the same underlying font.
+    val fontFamily: FontFamily by lazy {
+        when (this) {
             ROBOTO -> FontFamily(Font(R.font.roboto_variable))
             ROBOTO_FLEX -> FontFamily(Font(R.font.roboto_flex_variable))
             ROBOTO_MONO -> FontFamily(Font(R.font.roboto_mono_variable))
@@ -21,6 +24,7 @@ enum class FontChoice(val id: String, val displayName: String) {
             NOTO_SANS -> FontFamily(Font(R.font.noto_sans_variable))
             NOTO_SERIF -> FontFamily(Font(R.font.noto_serif_variable))
         }
+    }
 
     companion object {
         fun fromId(id: String?): FontChoice = entries.find { it.id == id } ?: ROBOTO

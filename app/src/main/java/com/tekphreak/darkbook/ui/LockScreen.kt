@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import com.tekphreak.darkbook.R
 import com.tekphreak.darkbook.data.PinManager
+import kotlinx.coroutines.delay
 import java.util.concurrent.Executor
 
 @Composable
@@ -32,6 +33,18 @@ fun LockScreen(activity: FragmentActivity, onUnlocked: () -> Unit) {
     var pinInput by remember { mutableStateOf("") }
     var confirmInput by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
+    var lockedOutUntil by remember { mutableStateOf(PinManager.lockedOutUntil(activity)) }
+    var now by remember { mutableStateOf(System.currentTimeMillis()) }
+
+    LaunchedEffect(lockedOutUntil) {
+        while (now < lockedOutUntil) {
+            delay(1000)
+            now = System.currentTimeMillis()
+        }
+    }
+
+    val isLockedOut = now < lockedOutUntil
+    val remainingSeconds = ((lockedOutUntil - now) / 1000L + 1).coerceAtLeast(0)
 
     val biometricAvailable = remember {
         BiometricManager.from(activity)
@@ -90,7 +103,7 @@ fun LockScreen(activity: FragmentActivity, onUnlocked: () -> Unit) {
             Text(stringRes(activity, R.string.lock_no_recovery), style = MaterialTheme.typography.bodySmall)
             Button(onClick = {
                 if (pinInput.length < 4) {
-                    error = null
+                    error = activity.getString(R.string.lock_pin_too_short)
                 } else if (pinInput != confirmInput) {
                     error = activity.getString(R.string.lock_pin_mismatch)
                 } else {
@@ -108,17 +121,29 @@ fun LockScreen(activity: FragmentActivity, onUnlocked: () -> Unit) {
                 value = pinInput,
                 onValueChange = { if (it.length <= 6) pinInput = it },
                 label = { Text(stringRes(activity, R.string.lock_enter_pin)) },
-                visualTransformation = PasswordVisualTransformation()
+                visualTransformation = PasswordVisualTransformation(),
+                enabled = !isLockedOut
             )
             error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            Button(onClick = {
-                if (PinManager.verifyPin(activity, pinInput)) {
-                    onUnlocked()
-                } else {
-                    error = activity.getString(R.string.lock_pin_wrong)
-                    pinInput = ""
+            if (isLockedOut) {
+                Text(
+                    activity.getString(R.string.lock_locked_out, remainingSeconds.toInt()),
+                    color = MaterialTheme.colorScheme.error
+                )
+            }
+            Button(
+                enabled = !isLockedOut,
+                onClick = {
+                    if (PinManager.verifyPin(activity, pinInput)) {
+                        onUnlocked()
+                    } else {
+                        error = activity.getString(R.string.lock_pin_wrong)
+                        pinInput = ""
+                        lockedOutUntil = PinManager.lockedOutUntil(activity)
+                        now = System.currentTimeMillis()
+                    }
                 }
-            }) { Text(stringRes(activity, R.string.lock_pin_submit)) }
+            ) { Text(stringRes(activity, R.string.lock_pin_submit)) }
         }
     }
 }

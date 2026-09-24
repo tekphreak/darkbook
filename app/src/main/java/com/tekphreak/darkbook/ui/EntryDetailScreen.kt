@@ -120,7 +120,8 @@ fun EntryDetailScreen(
                         }
                     }
                 )
-            }
+            },
+            bottomBar = { AdBanner() }
         ) { padding ->
             Column(
                 Modifier

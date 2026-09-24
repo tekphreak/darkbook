@@ -15,6 +15,14 @@ object PinManager {
     private const val KEY_SALT = "pin_salt"
     private const val KEY_HASH = "pin_hash"
     private const val KEY_FAILED_ATTEMPTS = "failed_attempts"
+    private const val KEY_LOCKOUT_UNTIL = "lockout_until"
+
+    // After this many consecutive wrong PINs in a row, entry is locked out for
+    // LOCKOUT_MS to slow down brute-forcing — no wipe, per darkbook.md's
+    // no-recovery-by-design stance (wiping the PIN on failure would only make
+    // that worse, not better).
+    private const val MAX_ATTEMPTS = 5
+    private const val LOCKOUT_MS = 30_000L
 
     private fun prefs(context: Context) = EncryptedSharedPreferences.create(
         context,
@@ -33,16 +41,37 @@ object PinManager {
             .putString(KEY_SALT, salt.joinToString("") { "%02x".format(it) })
             .putString(KEY_HASH, hash)
             .putInt(KEY_FAILED_ATTEMPTS, 0)
+            .putLong(KEY_LOCKOUT_UNTIL, 0L)
             .apply()
     }
 
+    /** Millis-since-epoch until which PIN entry is locked out, or 0 if not locked out. */
+    fun lockedOutUntil(context: Context): Long = prefs(context).getLong(KEY_LOCKOUT_UNTIL, 0L)
+
+    fun isLockedOut(context: Context): Boolean = System.currentTimeMillis() < lockedOutUntil(context)
+
     fun verifyPin(context: Context, pin: String): Boolean {
+        if (isLockedOut(context)) return false
+
         val p = prefs(context)
         val saltHex = p.getString(KEY_SALT, null) ?: return false
         val storedHash = p.getString(KEY_HASH, null) ?: return false
         val salt = saltHex.chunked(2).map { it.toInt(16).toByte() }.toByteArray()
         val matches = hash(pin, salt) == storedHash
-        p.edit().putInt(KEY_FAILED_ATTEMPTS, if (matches) 0 else failedAttempts(context) + 1).apply()
+
+        if (matches) {
+            p.edit().putInt(KEY_FAILED_ATTEMPTS, 0).putLong(KEY_LOCKOUT_UNTIL, 0L).apply()
+        } else {
+            val attempts = failedAttempts(context) + 1
+            val editor = p.edit()
+            if (attempts >= MAX_ATTEMPTS) {
+                editor.putInt(KEY_FAILED_ATTEMPTS, 0)
+                editor.putLong(KEY_LOCKOUT_UNTIL, System.currentTimeMillis() + LOCKOUT_MS)
+            } else {
+                editor.putInt(KEY_FAILED_ATTEMPTS, attempts)
+            }
+            editor.apply()
+        }
         return matches
     }
 

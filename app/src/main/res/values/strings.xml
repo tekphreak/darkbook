@@ -13,6 +13,8 @@
     <string name="lock_confirm_pin">Confirm PIN</string>
     <string name="lock_pin_mismatch">PINs don\'t match. Try again.</string>
     <string name="lock_pin_wrong">Wrong PIN.</string>
+    <string name="lock_pin_too_short">PIN must be at least 4 digits.</string>
+    <string name="lock_locked_out">Too many wrong PINs. Try again in %1$d seconds.</string>
     <string name="lock_pin_submit">Submit</string>
     <string name="lock_no_recovery">No recovery — this is a private diary. Forgetting your PIN means resetting the app.</string>
 

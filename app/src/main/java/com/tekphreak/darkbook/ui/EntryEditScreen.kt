@@ -27,6 +27,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,11 +60,24 @@ fun EntryEditScreen(
     val context = LocalContext.current
     var body by remember { mutableStateOf(initialBody) }
     var imagePath by remember { mutableStateOf(initialImagePath) }
+    var saved by remember { mutableStateOf(false) }
+
+    // Swaps in a new image path, deleting whatever file was attached before it —
+    // but only if that file was picked during this same session (not yet saved
+    // to the entry). The entry's originally-saved image, if the user backs out
+    // without saving, is left alone for onSave/updateEntry's own diff to handle.
+    fun replaceImage(newPath: String?) {
+        val old = imagePath
+        if (old != null && old != initialImagePath) {
+            ImageStore.deleteImage(context, old)
+        }
+        imagePath = newPath
+    }
 
     val pickImage = rememberLauncherForActivityResult(
         ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
-        if (uri != null) imagePath = ImageStore.saveImage(context, uri)
+        if (uri != null) replaceImage(ImageStore.saveImage(context, uri))
     }
 
     // Asked for just-in-time, only when creating a new entry, so editing an
@@ -71,16 +85,41 @@ fun EntryEditScreen(
     // just means the entry ends up with no location, same as any other entry.
     val requestLocationPermission = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
-    ) { onSave(body, imagePath) }
+    ) {
+        saved = true
+        onSave(body, imagePath)
+    }
 
     fun handleSave() {
         val hasLocationPermission = ContextCompat.checkSelfPermission(
             context, Manifest.permission.ACCESS_FINE_LOCATION
         ) == PackageManager.PERMISSION_GRANTED
         if (!isEditing && !hasLocationPermission) {
+            RelockGuard.suppressNextRelock()
             requestLocationPermission.launch(Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
+            saved = true
             onSave(body, imagePath)
+        }
+    }
+
+    // Cleans up an image picked during this session if the screen is left
+    // without saving (back button, process death aside) — otherwise it would
+    // sit on disk with no Entry ever pointing at it again. Reads `imagePath`/
+    // `saved` directly rather than via rememberUpdatedState: both are backed
+    // by a stable remember{}'d MutableState, so a direct read here already
+    // sees the latest value at the moment onDispose actually runs. Wrapping
+    // them in rememberUpdatedState was worse than useless — when saving
+    // synchronously flips `saved` and navigates away in the same click
+    // handler (the edit-existing-entry path), this composable never gets an
+    // intermediate recomposition to commit that value via SideEffect before
+    // disposal, so onDispose saw a stale `saved = false` and deleted the
+    // image that had just been written to the entry.
+    DisposableEffect(Unit) {
+        onDispose {
+            if (!saved && imagePath != null && imagePath != initialImagePath) {
+                ImageStore.deleteImage(context, imagePath!!)
+            }
         }
     }
 
@@ -97,6 +136,7 @@ fun EntryEditScreen(
                 },
                 actions = {
                     IconButton(onClick = {
+                        RelockGuard.suppressNextRelock()
                         pickImage.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                     }) {
                         Icon(
@@ -139,7 +179,7 @@ fun EntryEditScreen(
                             contentScale = ContentScale.Crop
                         )
                         IconButton(
-                            onClick = { imagePath = null },
+                            onClick = { replaceImage(null) },
                             modifier = Modifier.align(Alignment.TopEnd)
                         ) {
                             Icon(Icons.Filled.Close, contentDescription = stringResource(R.string.entry_remove_image))
