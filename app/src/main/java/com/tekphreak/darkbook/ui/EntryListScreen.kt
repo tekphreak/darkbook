@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.tekphreak.darkbook.R
@@ -38,6 +39,8 @@ import com.tekphreak.darkbook.ui.theme.LocalEntryFontSize
 import java.time.Instant
 import java.time.ZoneId
 import java.util.Locale
+
+private val FabColor = Color(0xFF808080)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,7 +75,11 @@ fun EntryListScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = onNewEntry) {
+            FloatingActionButton(
+                onClick = onNewEntry,
+                containerColor = FabColor,
+                contentColor = Color.White
+            ) {
                 Icon(Icons.Filled.Add, contentDescription = stringResource(R.string.entry_list_new))
             }
         },
