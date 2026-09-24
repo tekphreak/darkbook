@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+ always shows a system splash screen before onCreate runs.
+         Without these, the launcher icon — a flat, non-adaptive PNG — gets
+         wrapped in the system's default white icon backdrop, showing as a
+         white halo around the icon on cold start, before SplashActivity's
+         own black SplashContent() ever draws. -->
+    <style name="Theme.Darkbook" parent="Theme.Darkbook.Base">
+        <item name="android:windowSplashScreenBackground">@color/black</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/black</item>
+        <item name="android:windowSplashScreenAnimationDuration">1</item>
+    </style>
+</resources>
