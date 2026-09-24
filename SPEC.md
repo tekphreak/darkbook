@@ -15,7 +15,11 @@ A private, dark-themed journal app. Local-only storage, locked behind biometrics
 > including several features added after the initial build (image
 > attachments, location capture, font family + size selection, a generic
 > long-press share, a splash-screen preview toggle in Settings, and a
-> free/Pro build-flavor split with banner ads).
+> free/Pro build-flavor split with banner ads). Two addenda proposing a
+> Pro-only cipher/obfuscation menu and a milestone-based rating-prompt +
+> Pro cross-promotion sheet were drafted and briefly merged in here, then
+> explicitly rejected — Pro's only difference from the free build is,
+> and stays, no ads.
 
 ## Core Screens
 1. **Lock Screen** — shown on cold start and on resume-from-background (after a 30s grace period, to avoid re-locking on quick app-switches)
@@ -108,6 +112,13 @@ current schema version is 3.
 - Secondary/hint text: `#888888`
 - Accent (buttons, cursor): `#CCCCCC` or a single subdued color of choice
 - No pure-white surfaces/cards — keep everything black to stay OLED-friendly; use subtle `#111111` elevation tints if needed for Compose surfaces
+
+## App Icon
+- Black squircle base per this folder's app-wide icon standard, with a white open-book glyph (traced from `darkbooklogo.svg`/`darkbook.svg` in the repo root) centered on it — no text label
+- **Deviates from the folder-wide standard's white-text rule** — this is a graphic mark with no app-name text, by explicit user request, since the squircle/black-background/white-foreground treatment itself is what's being kept consistent
+- Generated for all 5 mipmap densities (`mdpi`–`xxxhdpi`) + the round variant, written to `app/src/main/res/mipmap-*/`
+- `free` and `pro` share this same icon resource (no per-flavor override) — regenerating it updates both apps identically
+- Generator script isn't checked into the repo (one-off, run from the scratch directory during the session that added it) — it rendered the source SVG, cropped to the circular glyph, thresholded out the white artwork as a transparent cutout, then composited that onto a fresh black squircle per density
 
 ## Build order (completed)
 1. Room + SQLCipher setup, Entry entity/DAO
